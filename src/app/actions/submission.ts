@@ -68,7 +68,7 @@ export async function submitStory(formData: FormData): Promise<SubmissionResult>
   const uploaded: string[] = [];
   for (const [i, img] of processed.entries()) {
     const path = `${id}/${i + 1}-${randomUUID().slice(0, 8)}.webp`;
-    const up = await db.storage.from("stories-pending").upload(path, img.buffer, { contentType: "image/webp", upsert: false });
+    const up = await db.storage.from("stories-pending").upload(path, img.buffer, { contentType: "image/webp", upsert: false, cacheControl: "300" });
     if (up.error) {
       console.error("[story] upload failed", up.error.message);
       continue;

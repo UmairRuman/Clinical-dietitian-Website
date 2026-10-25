@@ -38,6 +38,8 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: supabaseHost ? [{ protocol: "https", hostname: supabaseHost, pathname: "/storage/v1/object/public/**" }] : [],
     formats: ["image/avif", "image/webp"],
+    // short cache so a hidden/deleted story photo stops being served quickly
+    minimumCacheTTL: 300,
   },
   cacheComponents: true,
   partialPrefetching: true,

@@ -114,7 +114,7 @@ export async function addManualStory(_prev: ActionState, formData: FormData): Pr
   if (error) return { error: "Could not add the story." };
   for (const [i, img] of processed.entries()) {
     const path = `${id}/${i + 1}-${randomUUID().slice(0, 8)}.webp`;
-    const up = await db.storage.from("stories").upload(path, img.buffer, { contentType: "image/webp" });
+    const up = await db.storage.from("stories").upload(path, img.buffer, { contentType: "image/webp", cacheControl: "300" });
     if (!up.error) await db.from("submission_images").insert({ submission_id: id, path, width: img.width, height: img.height, sort_order: i });
   }
   updateTag("stories");
