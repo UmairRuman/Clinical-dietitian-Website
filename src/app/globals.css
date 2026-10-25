@@ -1,0 +1,202 @@
+@import "tailwindcss";
+
+/* ───────────── Design tokens (see .claude/specs/02-design-direction.md) ───────────── */
+:root {
+  --mint-50: #f3faf3;
+  --mint-100: #e4f3e6;
+  --mint-200: #d2ebd6;
+  --leaf-300: #a8d8b0;
+  --leaf-400: #8cc79a;
+  --leaf-500: #6fb07e;
+  --forest-700: #2f6b45;
+  --forest-800: #24553a;
+  --forest-900: #173a26;
+  --paper: #fbfaf4;
+  --sand: #efe6d2;
+  --clay: #d98e6b;
+  --ink-soft: #4d6455;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@theme inline {
+  --color-mint-50: var(--mint-50);
+  --color-mint-100: var(--mint-100);
+  --color-mint-200: var(--mint-200);
+  --color-leaf-300: var(--leaf-300);
+  --color-leaf-400: var(--leaf-400);
+  --color-leaf-500: var(--leaf-500);
+  --color-forest-700: var(--forest-700);
+  --color-forest-800: var(--forest-800);
+  --color-forest-900: var(--forest-900);
+  --color-paper: var(--paper);
+  --color-sand: var(--sand);
+  --color-clay: var(--clay);
+  --color-ink-soft: var(--ink-soft);
+  --font-display: var(--font-fraunces), Georgia, serif;
+  --font-sans: var(--font-figtree), system-ui, sans-serif;
+  --font-urdu: var(--font-nastaliq), serif;
+}
+
+html {
+  background: var(--mint-100);
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100dvh;
+  color: var(--forest-900);
+  font-family: var(--font-sans);
+  background: linear-gradient(180deg, var(--mint-50) 0%, var(--mint-100) 100%);
+  overflow-x: hidden;
+}
+
+/* Paper grain over everything – keeps flat gradients from looking digital */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.07;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .2  0 0 0 0 .3  0 0 0 0 .2  0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+::selection {
+  background: var(--leaf-300);
+  color: var(--forest-900);
+}
+
+:focus-visible {
+  outline: 3px solid var(--forest-700);
+  outline-offset: 3px;
+  border-radius: 12px;
+}
+
+/* User-written text can be Urdu script or Roman Urdu: let the browser pick direction */
+[dir="auto"]:lang(ur),
+.urdu {
+  font-family: var(--font-urdu), var(--font-sans);
+  line-height: 2;
+}
+
+/* ───────────── Entrance choreography (CSS-first so LCP never waits on JS) ───────────── */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes drift-a {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(var(--r, 0deg)); }
+  50% { transform: translate3d(14px, -22px, 0) rotate(calc(var(--r, 0deg) + 4deg)); }
+}
+@keyframes breathe {
+  0%, 100% { transform: scale(1); opacity: 0.55; }
+  50% { transform: scale(1.07); opacity: 0.9; }
+}
+@keyframes sheen {
+  0% { transform: translateX(-130%) skewX(-18deg); }
+  60%, 100% { transform: translateX(260%) skewX(-18deg); }
+}
+@keyframes ring {
+  0% { transform: scale(0.96); opacity: 0.55; }
+  100% { transform: scale(1.12); opacity: 0; }
+}
+
+.rise {
+  opacity: 0;
+  animation: rise 0.8s var(--ease-out) forwards;
+  animation-delay: var(--d, 0ms);
+}
+.pop {
+  opacity: 0;
+  animation: pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation-delay: var(--d, 0ms);
+}
+.draw {
+  stroke-dasharray: var(--len, 1200);
+  stroke-dashoffset: var(--len, 1200);
+  animation: draw 1.8s var(--ease-out) forwards;
+  animation-delay: var(--d, 0ms);
+}
+.drift {
+  animation: drift-a var(--t, 16s) ease-in-out infinite;
+  animation-delay: var(--d, 0s);
+}
+
+/* Primary CTA surface */
+.cta-surface {
+  background: linear-gradient(180deg, #b9e3c0 0%, var(--leaf-300) 55%, #98cfa2 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.75),
+    inset 0 -2px 0 rgba(47, 107, 69, 0.14),
+    0 1px 2px rgba(23, 58, 38, 0.18),
+    0 12px 28px -10px rgba(47, 107, 69, 0.55);
+}
+.cta-sheen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  animation: sheen 5.5s ease-in-out 2.2s infinite;
+}
+.cta-pulse::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid var(--leaf-500);
+  animation: ring 2.6s ease-out 2.4s infinite;
+  pointer-events: none;
+}
+
+.card-paper {
+  background: var(--paper);
+  border: 1px solid rgba(111, 176, 126, 0.28);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 18px 40px -22px rgba(36, 85, 58, 0.35);
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .rise, .pop, .draw {
+    animation: none;
+    opacity: 1;
+    transform: none;
+    stroke-dashoffset: 0;
+  }
+  .drift, .cta-sheen::after, .cta-pulse::before {
+    animation: none;
+  }
+}
